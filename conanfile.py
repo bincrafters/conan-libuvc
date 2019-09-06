@@ -1,3 +1,4 @@
+import os
 from conans import ConanFile, CMake, tools
 
 
@@ -14,13 +15,19 @@ class LibuvcConan(ConanFile):
     default_options = {"shared": False, "fPIC": True, "jpeg_turbo": False}
     generators = "cmake_find_package"
     requires = "libusb/1.0.22@bincrafters/stable"
+    exports = ["LICENSE.md"]
+    exports_sources = ["CMakeLists.txt"]
+
+    _source_subfolder = "source_subfolder"
+    _build_subfolder = "build_subfolder"
 
     def source(self):
-        git = tools.Git()
+        git = tools.Git(folder=self._source_subfolder)
         git.clone("https://github.com/libuvc/libuvc.git", "v0.0.6")
-        
-        tools.replace_in_file("CMakeLists.txt", "pkg_check_modules(LIBUSB libusb-1.0)", "find_package(libusb REQUIRED)")
-        tools.replace_in_file("CMakeLists.txt", "${LIBUSB_INCLUDE_DIRS}", "${libusb_INCLUDE_DIRS}/libusb-1.0")
+
+        _cmakelists = os.path.join(self._source_subfolder, "CMakeLists.txt")
+        tools.replace_in_file(_cmakelists, "pkg_check_modules(LIBUSB libusb-1.0)", "find_package(libusb REQUIRED)")
+        tools.replace_in_file(_cmakelists, "${LIBUSB_INCLUDE_DIRS}", "${libusb_INCLUDE_DIRS}/libusb-1.0")
         
         _jpg_find = '''find_package(jpeg QUIET)
 if(JPEG_FOUND)
@@ -43,9 +50,9 @@ set(JPEG_FOUND ON)
 set(JPEG_INCLUDE_DIR ${{{0}_INCLUDE_DIRS}})
 set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
         if self.options.jpeg_turbo:
-            tools.replace_in_file("CMakeLists.txt", _jpg_find, _jpg_replace.format('libjpeg-turbo'))
+            tools.replace_in_file(_cmakelists, _jpg_find, _jpg_replace.format('libjpeg-turbo'))
         else:
-            tools.replace_in_file("CMakeLists.txt", _jpg_find, _jpg_replace.format('libjpeg'))
+            tools.replace_in_file(_cmakelists, _jpg_find, _jpg_replace.format('libjpeg'))
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -68,13 +75,18 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
             _cmake_defs = {"CMAKE_BUILD_TARGET" : "Shared" }
         else:
             _cmake_defs = {"CMAKE_BUILD_TARGET" : "Static" }
-        cmake.configure(defs = _cmake_defs)
+        cmake.configure(defs = _cmake_defs, source_folder=self._source_subfolder, build_folder=self._build_subfolder)
         cmake.build()
 
     def package(self):
-        self.copy("*", dst="include", src="include")
+        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
+        self.copy("*.h", dst="include", src=os.path.join(self._source_subfolder, "include"))
+        self.copy("*.h", dst="include", src=os.path.join(self._build_subfolder, "include"))
         if self.options.shared:
-            self.copy("libuvc.so", dst="lib", keep_path=False)
+            self.copy("libuvc.so", dst="lib", src=self._build_subfolder, keep_path=False)
         else:
-            self.copy("libuvc.a", dst="lib", keep_path=False)
+            self.copy("libuvc.a", dst="lib", src=self._build_subfolder, keep_path=False)
+
+    def package_info(self):
+        self.cpp_info.libs = tools.collect_libs(self)
 

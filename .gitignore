@@ -42,11 +42,21 @@
 *.idb
 *.pdb
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# Cache
+__pycache__/*
+test_package/__pycache__/*
+test_package/build/*
+build/*
+*.pyc
+tmp/
+.DS_Store
+
+# IDE
+.idea/*
+.project
+.pydevproject
+.settings/*
+.ropeproject/*
+.vscode/*
+## emacs
+*~
