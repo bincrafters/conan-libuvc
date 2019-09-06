@@ -1,5 +1,4 @@
 [![Build Status Travis](https://travis-ci.com/SalDiAngelus/conan-libuvc.svg?branch=master)](https://travis-ci.com/SalDiAngelus/conan-libuvc)
-[![Build Status AppVeyor](https://ci.appveyor.com/api/projects/status/github/SalDiAngelus/conan-libuvc?branch=master&svg=true)](https://ci.appveyor.com/project/SalDiAngelus/conan-libuvc)
 
 ## Conan package recipe for [*libuvc*](https://github.com/libuvc/libuvc)
 

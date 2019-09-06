@@ -1,5 +1,6 @@
 import os
 from conans import ConanFile, CMake, tools
+from conans.errors import ConanInvalidConfiguration
 
 
 class LibuvcConan(ConanFile):
@@ -56,18 +57,14 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
 
     def configure(self):
         del self.settings.compiler.libcxx
+        if self.settings.compiler == "Visual Studio":
+            raise ConanInvalidConfiguration("This library is not compatible with Windows")
 
     def requirements(self):
         if self.options.jpeg_turbo:
             self.requires("libjpeg-turbo/2.0.2@bincrafters/stable")
         else:
             self.requires("libjpeg/9c@bincrafters/stable")
-
-    def config_options(self):
-        if self.settings.os != "Linux":
-            del self.options.enable_udev
-        if self.settings.compiler == "Visual Studio":
-            del self.options.fPIC
 
     def build(self):
         cmake = CMake(self)
