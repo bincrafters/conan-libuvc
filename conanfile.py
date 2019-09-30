@@ -59,7 +59,11 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
 
     def configure(self):
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
         if self.settings.compiler == "Visual Studio":
+            # Upstream issues, e.g.:
+            # https://github.com/libuvc/libuvc/issues/100
+            # https://github.com/libuvc/libuvc/issues/105
             raise ConanInvalidConfiguration("This library is not compatible with Windows")
 
     def requirements(self):
