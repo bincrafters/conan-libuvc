@@ -15,7 +15,7 @@ class LibuvcConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False], "jpeg_turbo": [True, False]}
     default_options = {"shared": False, "fPIC": True, "jpeg_turbo": False}
     generators = "cmake_find_package"
-    requires = "libusb/1.0.22@bincrafters/stable"
+    requires = "libusb/1.0.23@bincrafters/stable"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
 
