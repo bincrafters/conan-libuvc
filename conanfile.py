@@ -5,12 +5,12 @@ from conans.errors import ConanInvalidConfiguration
 
 class LibuvcConan(ConanFile):
     name = "libuvc"
-    version = "0.0.6"
-    license = "MIT"
-    author = "Salvatore DiAngelus sdiangelus@gmail.com"
-    url = "https://github.com/SalDiAngelus/conan-libuvc"
     description = "A cross-platform library for USB video devices"
     topics = ("conan", "libuvc", "libusb", "usb", "video")
+    license = "MIT"
+    author = "Salvatore DiAngelus <sdiangelus@gmail.com>"
+    url = "https://github.com/bincrafters/conan-libuvc"
+    homepage = "https://github.com/libuvc/libuvc"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False], "jpeg_turbo": [True, False]}
     default_options = {"shared": False, "fPIC": True, "jpeg_turbo": False}
@@ -23,8 +23,10 @@ class LibuvcConan(ConanFile):
     _build_subfolder = "build_subfolder"
 
     def source(self):
-        git = tools.Git(folder=self._source_subfolder)
-        git.clone("https://github.com/libuvc/libuvc.git", "v0.0.6")
+        tools.get(**self.conan_data["sources"][self.version])
+
+        extracted_dir = self.name + "-" + self.version
+        os.rename(extracted_dir, self._source_subfolder)
 
         _cmakelists = os.path.join(self._source_subfolder, "CMakeLists.txt")
         tools.replace_in_file(_cmakelists, "pkg_check_modules(LIBUSB libusb-1.0)", "find_package(libusb REQUIRED)")
@@ -62,9 +64,9 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
 
     def requirements(self):
         if self.options.jpeg_turbo:
-            self.requires("libjpeg-turbo/2.0.2@bincrafters/stable")
+            self.requires("libjpeg-turbo/2.0.2")
         else:
-            self.requires("libjpeg/9c@bincrafters/stable")
+            self.requires("libjpeg/9c")
 
     def build(self):
         cmake = CMake(self)
@@ -86,4 +88,3 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
-
