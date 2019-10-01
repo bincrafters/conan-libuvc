@@ -30,7 +30,7 @@ class LibuvcConan(ConanFile):
 
         _cmakelists = os.path.join(self._source_subfolder, "CMakeLists.txt")
         tools.replace_in_file(_cmakelists, "pkg_check_modules(LIBUSB libusb-1.0)", "find_package(libusb REQUIRED)")
-        tools.replace_in_file(_cmakelists, "${LIBUSB_INCLUDE_DIRS}", "${libusb_INCLUDE_DIRS}/libusb-1.0")
+        tools.replace_in_file(_cmakelists, "${LIBUSB_INCLUDE_DIRS}", "${libusb_INCLUDE_DIRS}")
         
         _jpg_find = '''find_package(jpeg QUIET)
 if(JPEG_FOUND)
