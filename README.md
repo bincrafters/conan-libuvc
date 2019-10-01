@@ -1,4 +1,4 @@
-[![Build Status Travis](https://travis-ci.com/SalDiAngelus/conan-libuvc.svg?branch=master)](https://travis-ci.com/SalDiAngelus/conan-libuvc)
+[![Build Status](https://travis-ci.com/bincrafters/conan-libuvc.svg?branch=stable%2F0.0.6)](https://travis-ci.com/bincrafters/conan-libuvc)
 
 ## Conan package recipe for [*libuvc*](https://github.com/libuvc/libuvc)
 
