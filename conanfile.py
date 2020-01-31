@@ -70,7 +70,7 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
         if self.options.jpeg_turbo:
             self.requires("libjpeg-turbo/2.0.2")
         else:
-            self.requires("libjpeg/9c")
+            self.requires("libjpeg/9d")
 
     def build(self):
         cmake = CMake(self)
