@@ -68,7 +68,7 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
 
     def requirements(self):
         if self.options.jpeg_turbo:
-            self.requires("libjpeg-turbo/2.0.2")
+            self.requires("libjpeg-turbo/2.0.4")
         else:
             self.requires("libjpeg/9d")
 
