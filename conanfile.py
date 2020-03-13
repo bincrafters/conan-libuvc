@@ -16,18 +16,33 @@ class LibuvcConan(ConanFile):
     default_options = {"shared": False, "fPIC": True, "jpeg_turbo": False}
     generators = "cmake_find_package"
     requires = "libusb/1.0.23"
-    exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
 
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
+    def configure(self):
+        del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
+        if self.settings.compiler == "Visual Studio":
+            # Upstream issues, e.g.:
+            # https://github.com/libuvc/libuvc/issues/100
+            # https://github.com/libuvc/libuvc/issues/105
+            raise ConanInvalidConfiguration("This library is not compatible with Windows")
+
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
-
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
 
+
+    def requirements(self):
+        if self.options.jpeg_turbo:
+            self.requires("libjpeg-turbo/2.0.4")
+        else:
+            self.requires("libjpeg/9d")
+
+    def build(self):
         _cmakelists = os.path.join(self._source_subfolder, "CMakeLists.txt")
         tools.replace_in_file(_cmakelists, "pkg_check_modules(LIBUSB libusb-1.0)", "find_package(libusb REQUIRED)")
         tools.replace_in_file(_cmakelists, "${LIBUSB_INCLUDE_DIRS}", "${libusb_INCLUDE_DIRS}")
@@ -57,22 +72,6 @@ set(JPEG_LINK_FLAGS ${{{0}_LIBS}})'''
         else:
             tools.replace_in_file(_cmakelists, _jpg_find, _jpg_replace.format('libjpeg'))
 
-    def configure(self):
-        del self.settings.compiler.libcxx
-        del self.settings.compiler.cppstd
-        if self.settings.compiler == "Visual Studio":
-            # Upstream issues, e.g.:
-            # https://github.com/libuvc/libuvc/issues/100
-            # https://github.com/libuvc/libuvc/issues/105
-            raise ConanInvalidConfiguration("This library is not compatible with Windows")
-
-    def requirements(self):
-        if self.options.jpeg_turbo:
-            self.requires("libjpeg-turbo/2.0.4")
-        else:
-            self.requires("libjpeg/9d")
-
-    def build(self):
         cmake = CMake(self)
         if self.options.shared:
             _cmake_defs = {"CMAKE_BUILD_TARGET" : "Shared" }
